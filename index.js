@@ -27,9 +27,26 @@ io.on('connection', (socket) => {
     console.log('User disconnected');
   });
 
+  // Réaction a la reception de message
   socket.on('message', (msg) => {
     console.log('New Message: ', msg);
     io.emit('message', msg);
+  });
+
+  // Mecanisme des groupes
+  socket.on('groupJoin', (group) => {
+    console.log('Join Group: ', group);
+    io.to(group).emit('message', `[${group}] Un nouveau est là :o`);
+    socket.join(group);
+  });
+  socket.on('groupLeave', (group) => {
+    console.log('Leave Group: ', group);
+    socket.leave(group);
+    io.to(group).emit('message', `[${group}] On a un fuyard`);
+  });
+  socket.on('groupMessage', (group, msg) => {
+    console.log('New Group Message: ', group, msg);
+    io.to(group).emit('message', `[${group}] ${msg}`);
   });
 });
 
